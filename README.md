@@ -1,42 +1,42 @@
-# Recette
+# Recipe
 
-Générateur de recettes basé sur un agent LangChain. Le script assemble un prompt de chef cuisinier, envoie la liste d’ingrédients au modèle OpenAI, puis affiche une recette structurée qui n’utilise que ces ingrédients.
+Recipe generator built on a LangChain agent. The script builds a chef prompt, sends the ingredient list to the OpenAI model, then prints a structured recipe that uses only those ingredients.
 
-## Prérequis
+## Prerequisites
 
 - Python 3.10+
-- Une clé API OpenAI
+- An OpenAI API key
 
 ## Installation
 
 ```bash
-pip install langchain-openai langchain-core python-dotenv
+pip install -r requirements.txt
 ```
 
 ## Configuration
 
-Créer un fichier `.env` à la racine du projet :
+Create a `.env` file at the project root:
 
 ```env
 OPENAI_API_KEY=...
 ```
 
-## Utilisation
+## Usage
 
-Exécuter le script principal :
+Run the main script:
 
 ```bash
 python agentia/main.py
 ```
 
-Par défaut, la liste d’ingrédients est définie dans `agentia/main.py`. Modifiez la variable `ingredients` pour générer une nouvelle recette.
+By default, the ingredient list is defined in `agentia/main.py`. Edit the `ingredients` variable to generate a new recipe.
 
 ## Structure
 
-- `agentia/main.py` : point d’entrée, envoie les ingrédients à l’agent.
-- `agentia/agent.py` : configuration du modèle et du prompt.
-- `agentia/prompts.py` : prompt système “chef cuisinier”.
+- `agentia/main.py`: entry point, sends ingredients to the agent.
+- `agentia/agent.py`: model and prompt configuration.
+- `agentia/prompts.py`: “chef” system prompt.
 
 ## Notes
 
-Le modèle utilisé est `gpt-4o-mini` avec une température de 0.6 (définis dans `agentia/agent.py`).
+The model used is `gpt-4o-mini` with a temperature of 0.6 (defined in `agentia/agent.py`).
