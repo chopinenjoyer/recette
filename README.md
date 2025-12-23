@@ -29,13 +29,15 @@ Run the main script:
 python agentia/main.py
 ```
 
-By default, the ingredient list is defined in `agentia/main.py`. Edit the `ingredients` variable to generate a new recipe.
+By default, the ingredient list is loaded from `data/ingredients.txt`. Edit that file (one ingredient per line) to generate a new recipe.
 
 ## Structure
 
 - `agentia/main.py`: entry point, sends ingredients to the agent.
 - `agentia/agent.py`: model and prompt configuration.
 - `agentia/prompts.py`: “chef” system prompt.
+- `agentia/tools.py`: helper to load ingredients from file.
+- `data/ingredients.txt`: list of ingredients, one per line.
 
 ## Notes
 
