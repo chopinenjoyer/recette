@@ -1,20 +1,18 @@
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
-from agentia.prompts import SYSTEM_PROMPT
 from dotenv import load_dotenv
 from pathlib import Path
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
-load_dotenv(ROOT_DIR / ".env")
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 llm = ChatOpenAI(
     temperature=0.6,
     model="gpt-4o-mini"
 )
 
-prompt = ChatPromptTemplate.from_messages([
-    ("system", SYSTEM_PROMPT),
-    ("human", "{input}")
-])
-
-chain = prompt | llm
+def build_chain(system_prompt: str):
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", system_prompt),
+        ("human", "{input}")
+    ])
+    return prompt | llm
