@@ -166,4 +166,43 @@ BUDGET :
 REMARQUES :
 - Conseils nutritionnels selon l’objectif
 - Ajustements possibles
+
+FORMAT DE SORTIE OBLIGATOIRE (À RESPECTER STRICTEMENT) :
+
+À la fin de ta réponse, fournis un bloc JSON STRICT, sans texte autour,
+avec cette structure EXACTE :
+
+{{
+  "ingredients": [
+    "ingredient_1",
+    "ingredient_2",
+    "ingredient_3"
+  ]
+}}
+
+- uniquement les ingrédients réellement présents dans la liste
+- pas de quantités
+- pas de prix
+- pas de catégories
+- noms simples en minuscules
+
+FORMAT TECHNIQUE (NE PAS AFFICHER AU LECTEUR) :
+
+À la toute fin de ta réponse, ajoute un bloc JSON STRICT
+ENCADRÉ ENTRE LES BALISES SUIVANTES (ET RIEN D’AUTRE) :
+
+<json>
+{{
+  "ingredients": [
+    "ingredient_1",
+    "ingredient_2",
+    "ingredient_3"
+  ]
+}}
+</json>
+
+ Le contenu entre <json> et </json> est destiné UNIQUEMENT au système.
+ Ne fais AUCUNE référence à ce JSON dans le texte affiché à l’utilisateur.
+
+
 """

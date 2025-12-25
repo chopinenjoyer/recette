@@ -1,3 +1,7 @@
 .env
 /.venv
-/agentia/__pycache__
+/*/__pycache__
+/*/*/__pycache__
+agentia/data/state
+*.pdf
+/data

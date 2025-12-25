@@ -1,18 +1,15 @@
 from agentia.agent import build_chain
-from agentia.tools import read_ingredients
 from agentia.pricing.selector import get_price_provider
 from agentia.nutrition.calculator import calculate_macros
-from agentia.data.knowledge.seasons import current_season
-from agentia.utils.io import ask_int
 from agentia.prompts import (
     SYSTEM_PROMPT,
     MEAL_PLANNER_WITH_RECIPES_PROMPT,
     SHOPPING_LIST_PROMPT,
 )
-from agentia.data.state.history import (
-    save_shopping_list,
-    get_used_ingredients
-)
+from agentia.utils.io import ask_int
+from agentia.utils.history import save_shopping_list
+from agentia.utils.ingredient_selector import select_ingredients
+from agentia.utils.parser import remove_json_block, extract_ingredients_from_response
 
 
 def ask_mode() -> str:
@@ -24,29 +21,20 @@ def ask_mode() -> str:
 
     if choice == "1":
         return "recipe"
-    elif choice == "2":
+    if choice == "2":
         return "planner"
-    elif choice == "3":
+    if choice == "3":
         return "shopping"
-    else:
-        print("Choix invalide.")
-        return ask_mode()
+    return ask_mode()
+
 
 def ask_duration() -> str:
     return input("Durée (ex : 1 semaine, 2 semaines, 1 mois) : ").strip()
 
+
 def ask_budget() -> str:
     return input("Budget maximum (€) : ").strip()
 
-def ask_people() -> int:
-    while True:
-        try:
-            people = int(input("Nombre de personnes : "))
-            if people > 0:
-                return people
-        except ValueError:
-            pass
-        print("Veuillez entrer un nombre valide.")
 
 def ask_goal() -> str:
     print("Objectif sportif :")
@@ -57,13 +45,12 @@ def ask_goal() -> str:
 
     if choice == "1":
         return "prise"
-    elif choice == "2":
+    if choice == "2":
         return "maintien"
-    elif choice == "3":
+    if choice == "3":
         return "seche"
-    else:
-        print("Choix invalide.")
-        return ask_goal()
+    return ask_goal()
+
 
 def ask_store() -> str:
     print("Choisis une enseigne :")
@@ -72,93 +59,101 @@ def ask_store() -> str:
     choice = input("> ").strip()
 
     if choice == "1":
-        return "intermarché"
-    elif choice == "2":
+        return "intermarche"
+    if choice == "2":
         return "estimation"
-    else:
-        print("Choix invalide.")
-        return ask_store()
+    return ask_store()
+
 
 def main():
     mode = ask_mode()
-    ingredients = read_ingredients()
 
     if mode == "recipe":
         chain = build_chain(SYSTEM_PROMPT)
-        user_input = f"Ingrédients disponibles : {ingredients}"
-        result = chain.invoke({"input": user_input})
-        print("\n" + result.content)
+        result = chain.invoke({"input": "Crée une recette équilibrée."})
+        print(remove_json_block(result.content))
+        return
 
-    elif mode == "planner":
+    if mode == "planner":
         duration = ask_duration()
         chain = build_chain(MEAL_PLANNER_WITH_RECIPES_PROMPT)
-        user_input = f"""
-Ingrédients disponibles : {ingredients}
-Durée : {duration}
-"""
-        result = chain.invoke({"input": user_input})
-        print("\n" + result.content)
+        result = chain.invoke({"input": f"Planifie des repas pour {duration}."})
+        print(remove_json_block(result.content))
+        return
 
-    elif mode == "shopping":
+    if mode == "shopping":
         duration = ask_duration()
         budget = ask_budget()
         people = ask_int("Nombre de personnes : ")
         goal = ask_goal()
         store = ask_store()
 
+        days = 7 if "semaine" in duration else 30
+
         macros = calculate_macros(
             weight_kg=70,
             objective=goal,
-            days=7 if "semaine" in duration else 30,
+            days=days,
             persons=people
         )
 
+        ingredient_pool = select_ingredients(
+            days=days,
+            persons=people,
+            objective=goal
+        )
+
+        print("DEBUG ingredient_pool type:", type(ingredient_pool))
+        print("DEBUG ingredient_pool:", ingredient_pool)
+
         provider = get_price_provider(store)
-        prices = provider.get_prices(ingredients)
+        prices = provider.get_prices(
+            ingredient_pool["proteines"]
+            + ingredient_pool["feculents"]
+            + ingredient_pool["legumes"]
+            + ingredient_pool["fruits"]
+            + ingredient_pool["lipides"]
+        )
 
         prices_text = "\n".join(
             f"- {p['ingredient']} : {p.get('price', 'N/A')} €"
-            if "price" in p else f"- {p['ingredient']} : NON TROUVÉ"
             for p in prices
         )
 
         chain = build_chain(SHOPPING_LIST_PROMPT)
-        used_ingredients = get_used_ingredients()
-
-        user_input = f"""
+        result = chain.invoke({
+            "input": f"""
 Objectif sportif : {goal}
 Calories par jour : {macros['calories_per_day']}
 Protéines (g/jour) : {macros['protein_g_per_day']}
 Glucides (g/jour) : {macros['carbs_g_per_day']}
 Lipides (g/jour) : {macros['fats_g_per_day']}
-Calories totales période : {macros['total_calories']}
 Nombre de personnes : {people}
 Durée : {duration}
-Budget maximum global : {budget} €
+Budget maximum : {budget} €
 
-Voici les prix observés ({store}) :
+Ingrédients autorisés :
 
+Protéines : {ingredient_pool['proteines']}
+Glucides : {ingredient_pool['feculents']}
+Légumes : {ingredient_pool['legumes']}
+Fruits : {ingredient_pool['fruits']}
+Lipides : {ingredient_pool['lipides']}
+
+Prix observés :
 {prices_text}
 
-INGRÉDIENTS DÉJÀ UTILISÉS DANS LES LISTES PRÉCÉDENTES
-(À ÉVITER AUTANT QUE POSSIBLE) :
-{used_ingredients}
-
-CONTRAINTES OBLIGATOIRES :
-- Évite au maximum les ingrédients déjà utilisés
-- Introduis de nouvelles sources de protéines
-- Varie féculents et légumes
-- Aucun ingrédient ne doit apparaître plus de 2 fois
-- Propose plusieurs styles culinaires
-
-À partir de ces données :
-- optimise la liste de courses
-- respecte le budget
+Respecte strictement ces ingrédients.
 """
+        })
 
-        result = chain.invoke({"input": user_input})
-        print("\n" + result.content)
-        save_shopping_list(ingredients)
+        clean_text = remove_json_block(result.content)
+        print(clean_text)
+
+        extracted = extract_ingredients_from_response(result.content)
+        if extracted:
+            save_shopping_list(extracted)
+
 
 if __name__ == "__main__":
     main()

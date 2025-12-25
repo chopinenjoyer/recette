@@ -12,16 +12,19 @@ def read_json(*path_parts, default=None):
         return json.load(f)
 
 
-def write_json(data, *path_parts):
+def write_json(*path_parts, data):
     path = BASE_DIR.joinpath(*path_parts)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
-def ask_int(prompt):
+def ask_int(prompt: str) -> int:
     while True:
         try:
-            return int(input(prompt))
+            value = int(input(prompt))
+            if value > 0:
+                return value
         except ValueError:
-            print("Veuillez entrer un nombre valide.")
+            pass
+        print("Veuillez entrer un nombre valide.")

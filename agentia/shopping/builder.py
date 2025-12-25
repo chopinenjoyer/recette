@@ -1,4 +1,4 @@
-from agentia.data.state.history import load_history
+from agentia.utils.history import load_history
 
 def penalize_used_ingredients(candidates, history):
     used = set()
