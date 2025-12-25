@@ -115,6 +115,22 @@ REPÈRES GÉNÉRAUX :
 - Maintien : calories modérées
 - Sèche : calories réduites, protéines élevées
 
+Contraintes obligatoires :
+- Chaque jour doit utiliser la protéine et le style indiqués
+- Aucun plat ne doit se ressembler
+- Varier les techniques de cuisson
+- Ne pas répéter deux fois la même protéine consécutivement
+- Adapter les portions aux objectifs sportifs
+
+CONTRAINTES DE VARIÉTÉ OBLIGATOIRES :
+
+- Évite au maximum les ingrédients déjà utilisés précédemment
+- Introduis de nouvelles sources de protéines (poisson, végétal, viande différente)
+- Varie les féculents (riz, pâtes, quinoa, pommes de terre, légumineuses)
+- Varie les légumes chaque semaine
+- Propose AU MOINS 3 styles culinaires différents
+- Aucun ingrédient ne doit apparaître plus de 2 fois sur la période
+
 FORMAT STRICT À RESPECTER :
 
 Objectif sportif :
