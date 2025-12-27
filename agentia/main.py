@@ -9,10 +9,53 @@ from agentia.prompts import (
 from agentia.utils.io import ask_int
 from agentia.utils.history import save_shopping_list
 from agentia.utils.ingredient_selector import select_ingredients
-from agentia.utils.parser import remove_json_block, extract_ingredients_from_response
+from agentia.utils.parser import (
+    remove_json_block,
+    extract_ingredients_from_response,
+    extract_disliked_ingredients,
+    extract_disliked_categories,
+)
+from agentia.utils.preferences import (
+    load_preferences,
+    add_excluded_ingredient,
+    add_allergy,
+    add_excluded_category,
+)
 
 
-def ask_mode() -> str:
+def onboarding_preferences():
+    prefs = load_preferences()
+    if prefs["excluded_ingredients"] or prefs["allergies"] or prefs["excluded_categories"]:
+        return
+
+    print("\nPremière utilisation – personnalisation")
+
+    disliked = input(
+        "Ingrédients que vous n'aimez pas (séparés par des virgules, ou Entrée) : "
+    ).strip()
+
+    if disliked:
+        for i in disliked.split(","):
+            add_excluded_ingredient(i.strip().lower())
+
+    allergies = input(
+        "Allergies alimentaires (séparées par des virgules, ou Entrée) : "
+    ).strip()
+
+    if allergies:
+        for i in allergies.split(","):
+            add_allergy(i.strip().lower())
+
+    categories = input(
+        "Catégories à exclure (ex: fruits, poissons, fruits de mer) : "
+    ).strip()
+
+    if categories:
+        for c in categories.split(","):
+            add_excluded_category(c.strip().lower())
+
+
+def ask_mode():
     print("\nChoisis un mode :")
     print("1 - Créer une recette")
     print("2 - Prévoir des repas sur plusieurs jours")
@@ -28,15 +71,15 @@ def ask_mode() -> str:
     return ask_mode()
 
 
-def ask_duration() -> str:
+def ask_duration():
     return input("Durée (ex : 1 semaine, 2 semaines, 1 mois) : ").strip()
 
 
-def ask_budget() -> str:
+def ask_budget():
     return input("Budget maximum (€) : ").strip()
 
 
-def ask_goal() -> str:
+def ask_goal():
     print("Objectif sportif :")
     print("1 - Prise de masse")
     print("2 - Maintien")
@@ -52,7 +95,7 @@ def ask_goal() -> str:
     return ask_goal()
 
 
-def ask_store() -> str:
+def ask_store():
     print("Choisis une enseigne :")
     print("1 - Intermarché (prix réels)")
     print("2 - Estimation IA")
@@ -82,6 +125,8 @@ def main():
         return
 
     if mode == "shopping":
+        onboarding_preferences()
+
         duration = ask_duration()
         budget = ask_budget()
         people = ask_int("Nombre de personnes : ")
@@ -94,17 +139,14 @@ def main():
             weight_kg=70,
             objective=goal,
             days=days,
-            persons=people
+            persons=people,
         )
 
         ingredient_pool = select_ingredients(
             days=days,
             persons=people,
-            objective=goal
+            objective=goal,
         )
-
-        print("DEBUG ingredient_pool type:", type(ingredient_pool))
-        print("DEBUG ingredient_pool:", ingredient_pool)
 
         provider = get_price_provider(store)
         prices = provider.get_prices(
@@ -121,8 +163,9 @@ def main():
         )
 
         chain = build_chain(SHOPPING_LIST_PROMPT)
-        result = chain.invoke({
-            "input": f"""
+        result = chain.invoke(
+            {
+                "input": f"""
 Objectif sportif : {goal}
 Calories par jour : {macros['calories_per_day']}
 Protéines (g/jour) : {macros['protein_g_per_day']}
@@ -142,13 +185,24 @@ Lipides : {ingredient_pool['lipides']}
 
 Prix observés :
 {prices_text}
-
-Respecte strictement ces ingrédients.
 """
-        })
+            }
+        )
 
-        clean_text = remove_json_block(result.content)
-        print(clean_text)
+        print(remove_json_block(result.content))
+
+        feedback = input(
+            "\nSouhaitez-vous exclure un ingrédient ou une catégorie ?\n> "
+        ).strip()
+
+        if feedback:
+            for ing in extract_disliked_ingredients(feedback):
+                add_excluded_ingredient(ing)
+
+            for cat in extract_disliked_categories(feedback):
+                add_excluded_category(cat)
+
+            print("\nPréférences mises à jour. Relancez pour une nouvelle liste.")
 
         extracted = extract_ingredients_from_response(result.content)
         if extracted:

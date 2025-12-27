@@ -20,6 +20,7 @@ __pycache__/
 # Données runtime (NON versionnées)
 # ========================
 agentia/data/state/history.json
+agentia/data/state/preferences.json
 
 # ========================
 # Exports / fichiers générés
