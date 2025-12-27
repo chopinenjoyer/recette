@@ -1,6 +1,6 @@
 # Recipe
 
-Recipe generator built on a LangChain agent. The script builds a chef prompt, sends the ingredient list to the OpenAI model, then prints a structured recipe that uses only those ingredients.
+Interactive French CLI for generating recipes, multi-day meal plans, and budget-aware shopping lists. Built on LangChain + OpenAI, with nutrition targets, ingredient diversity, and optional real price lookups.
 
 ## Prerequisites
 
@@ -23,26 +23,35 @@ Create a `.env` file at the project root:
 
 ```env
 OPENAI_API_KEY=...
+INTERMARCHE_API_KEY=... # optional, only needed for real prices
 ```
 
 ## Usage
 
-Run the main script:
+Run the main script and choose a mode:
 
 ```bash
-python agentia/main.py
+python3 -m agentia.main
 ```
 
-By default, the ingredient list is loaded from `data/ingredients.txt`. Edit that file (one ingredient per line) to generate a new recipe.
+Modes:
+- Recipe: one-off structured recipe.
+- Planner: multi-day meal plan with full recipes for each meal.
+- Shopping list: sports goal + budget + macros, seasonal ingredients, and optional pricing.
 
 ## Structure
 
-- `agentia/main.py`: entry point, sends ingredients to the agent.
-- `agentia/agent.py`: model and prompt configuration.
-- `agentia/prompts.py`: “chef” system prompt.
-- `agentia/tools.py`: helper to load ingredients from file.
-- `data/ingredients.txt`: list of ingredients, one per line.
+- `agentia/main.py`: CLI entry point and mode selection.
+- `agentia/agent.py`: OpenAI model and prompt wiring.
+- `agentia/prompts.py`: recipe, planner, and shopping list prompts.
+- `agentia/nutrition/`: macro calculator and sport profiles.
+- `agentia/pricing/`: pricing providers (Intermarché API or estimation).
+- `agentia/utils/`: preferences, parsing, history, ingredient selection.
+- `agentia/data/knowledge/`: food groups, seasons, and category map.
+- `agentia/data/state/preferences.json`: saved dislikes/allergies/categories.
+- `agentia/data/state/history.json`: last shopping lists for variety.
 
 ## Notes
 
-The model used is `gpt-4o-mini` with a temperature of 0.6 (defined in `agentia/agent.py`).
+- The model used is `gpt-4o-mini` with a temperature of 0.6 (defined in `agentia/agent.py`).
+- Intermarché pricing requires `INTERMARCHE_API_KEY` and makes API calls.
