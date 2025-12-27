@@ -1,6 +1,10 @@
 from agentia.agent import build_chain
+from agentia.tools import read_ingredients
 from agentia.pricing.selector import get_price_provider
-from agentia.nutrition.calculator import calculate_macros
+from agentia.nutrition.calculator import (
+    calculate_macros,
+    ask_weight,
+)
 from agentia.prompts import (
     SYSTEM_PROMPT,
     MEAL_PLANNER_WITH_RECIPES_PROMPT,
@@ -78,7 +82,6 @@ def ask_duration():
 def ask_budget():
     return input("Budget maximum (€) : ").strip()
 
-
 def ask_goal():
     print("Objectif sportif :")
     print("1 - Prise de masse")
@@ -112,10 +115,30 @@ def main():
     mode = ask_mode()
 
     if mode == "recipe":
+        ingredients = read_ingredients()
+
+        if not ingredients:
+            print("Aucun ingrédient fourni dans ingredients.txt")
+            return
+
         chain = build_chain(SYSTEM_PROMPT)
-        result = chain.invoke({"input": "Crée une recette équilibrée."})
+
+        result = chain.invoke({
+            "input": f"""
+Crée une recette en utilisant UNIQUEMENT les ingrédients suivants.
+Tu n'as PAS le droit d'en ajouter d'autres.
+
+Ingrédients disponibles :
+{", ".join(ingredients)}
+
+Si un ingrédient manque pour une recette cohérente, adapte la recette
+au lieu d'inventer un nouvel ingrédient.
+"""
+    })
+
         print(remove_json_block(result.content))
         return
+
 
     if mode == "planner":
         duration = ask_duration()
@@ -132,11 +155,12 @@ def main():
         people = ask_int("Nombre de personnes : ")
         goal = ask_goal()
         store = ask_store()
+        weight = ask_weight()
 
         days = 7 if "semaine" in duration else 30
 
         macros = calculate_macros(
-            weight_kg=70,
+            weight_kg=weight,
             objective=goal,
             days=days,
             persons=people,
