@@ -1,49 +1,79 @@
 from datetime import datetime
 
+from datetime import datetime
+
 SEASONAL_PRODUCTS = {
     "hiver": {
         "legumes": [
-            "chou_vert", "chou_fleur", "poireau",
-            "carotte", "navet", "panais",
-            "endive", "epinards", "courge",
-            "potiron", "butternut"
+            "chou_vert", "chou_fleur", "chou_rouge",
+            "choux_bruxelles",
+            "poireau", "carotte", "navet", "panais",
+            "endive", "epinards",
+            "courge", "potiron", "butternut",
+            "celeri_rave", "betterave",
+            "topinambour", "fenouil"
         ],
         "fruits": [
-            "pomme", "poire", "kiwi",
-            "orange", "mandarine"
+            "pomme", "poire",
+            "orange", "mandarine",
+            "pamplemousse",
+            "kiwi",
+            "citron"
         ]
     },
+
     "printemps": {
         "legumes": [
-            "asperges", "radis", "epinards",
-            "laitue", "petits_pois",
-            "artichaut"
+            "asperges", "radis",
+            "epinards", "laitue", "roquette", "mache",
+            "petits_pois", "feves",
+            "artichaut",
+            "poireau"
         ],
         "fruits": [
-            "fraise", "cerise"
+            "fraise",
+            "cerise",
+            "rhubarbe"
         ]
     },
+
     "ete": {
         "legumes": [
-            "tomate", "tomate_cerise", "courgette",
-            "aubergine", "poivron", "concombre"
+            "tomate", "tomate_cerise",
+            "courgette", "aubergine",
+            "poivron",
+            "concombre",
+            "haricots_verts",
+            "mais"
         ],
         "fruits": [
-            "melon", "pasteque", "abricot",
-            "peche", "nectarine", "framboise"
+            "abricot", "peche", "nectarine",
+            "melon", "pasteque",
+            "framboise", "myrtille",
+            "mure",
+            "raisin"
         ]
     },
+
     "automne": {
         "legumes": [
             "courge", "potiron", "butternut",
-            "champignons", "brocoli",
-            "epinards"
+            "champignons", "champignon_paris",
+            "shiitake", "pleurotes", "portobello",
+            "brocoli",
+            "epinards",
+            "poireau",
+            "fenouil"
         ],
         "fruits": [
-            "pomme", "poire", "raisin", "figue"
+            "pomme", "poire",
+            "raisin",
+            "figue",
+            "prune"
         ]
     }
 }
+
 
 def current_season() -> str:
     month = datetime.now().month
@@ -59,3 +89,14 @@ def seasonal_legumes(all_legumes: list) -> list:
     season = current_season()
     allowed = SEASONAL_PRODUCTS.get(season, {}).get("legumes", [])
     return [l for l in all_legumes if l in allowed]
+
+def filter_by_season(
+    items: list[str],
+    category: str
+) -> list[str]:
+    """
+    category = 'legumes' ou 'fruits'
+    """
+    season = current_season()
+    allowed = SEASONAL_PRODUCTS.get(season, {}).get(category, [])
+    return [i for i in items if i in allowed]

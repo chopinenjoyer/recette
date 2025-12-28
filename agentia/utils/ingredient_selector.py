@@ -3,8 +3,17 @@ from agentia.data.knowledge.food_groups import FOOD_GROUPS
 from agentia.data.knowledge.category_map import CATEGORY_MAP
 from agentia.utils.preferences import load_preferences
 from agentia.utils.history import get_used_ingredients
+from agentia.data.knowledge.seasons import filter_by_season
 
+legumes = filter_by_season(
+    FOOD_GROUPS["legumes"],
+    category="legumes"
+)
 
+fruits = filter_by_season(
+    FOOD_GROUPS["fruits"],
+    category="fruits"
+)
 def select_ingredients(days: int, persons: int, objective: str):
     prefs = load_preferences()
 
@@ -44,3 +53,4 @@ def select_ingredients(days: int, persons: int, objective: str):
         "fruits": [] if "fruits" in excluded_categories else pick("fruits", 2),
         "lipides": pick("matieres_grasses", 2),
     }
+

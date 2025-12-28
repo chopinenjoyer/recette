@@ -72,7 +72,7 @@ def ask_mode():
 
 
 def ask_duration():
-    return input("Durée (ex : 1 semaine, 2 semaines, 1 mois) : ").strip()
+    return input("Durée (ex : 1 semaine à 2 semaines) : ").strip()
 
 
 def ask_budget():
