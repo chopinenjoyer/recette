@@ -1,5 +1,8 @@
 from agentia.nutrition.profiles import SPORT_PROFILES
 
+def ask_weight():
+   return input("Quelle est votre poids(n'ayez pas honte, on vous aime comme vous êtes) : ").strip()
+
 def calculate_macros(
     weight_kg: float,
     objective: str,
