@@ -1,3 +1,12 @@
 .env
 /.venv
+*.secret
+secrets.json
+config/*.secret
+
 /agentia/__pycache__
+/app/__pycache__
+/app/v1/__pycache__
+*.py[cod]
+*.sqlite3
+*.db
