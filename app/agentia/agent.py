@@ -5,7 +5,7 @@ import json
 import re
 from typing import List, Dict, Optional
 
-load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 

@@ -1,20 +1,18 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List
+
 
 class Ingredient(BaseModel):
     name: str
     quantity: str
-
-class RecipeBase(BaseModel):
-    title: str
-    description: Optional[str] = None
+    
+class RecipeCreate(BaseModel):
     ingredients: List[Ingredient]
 
-class RecipeCreate(RecipeBase):
-    pass
-
-class Recipe(RecipeBase):
+class RecipeOut(BaseModel):
     id: int
-
-    class Config:
-        orm_mode = True
+    title: str
+    description: str
+    instructions: str
+    ingredients: List[Ingredient]
+    generated_by: str

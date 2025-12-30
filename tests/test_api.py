@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 from app.apimain import app
+import app.agentia.agent as agent_module
 
 client = TestClient(app)
 
@@ -15,7 +16,6 @@ def test_get_recipes():
 
 def test_create_recipe():
     recipe_data = {
-        "title": "Test Recipe",
         "description": "Test description",
         "ingredients": [
             {"name": "ingredient1", "quantity": "1"},
@@ -25,6 +25,9 @@ def test_create_recipe():
     response = client.post("/api/v1/recipes/", json=recipe_data)
     assert response.status_code == 201
     data = response.json()
-    assert data["title"] == recipe_data["title"]
+    assert "title" in data
+    assert isinstance(data["title"], str)
+    assert len(data["instructions"]) > 0
+
     assert "id" in data
     assert "generated_by" in data
