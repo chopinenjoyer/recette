@@ -1,10 +1,10 @@
 from typing import List
-from app.agentia.main import RecipeAgent
-from app. import RecipeRepository
+from app.agentia.agent import generate_recipe
+from app.repositories.recipes_repo import RecipeRepository
 
 
 class RecipeService:
-    def __init__(self, repo: RecipeRepository, agent: RecipeAgent):
+    def __init__(self, repo: RecipeRepository, agent: generate_recipe):
         self.repo = repo
         self.agent = agent
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
 from app.api.v1.schemas import RecipeCreate, RecipeOut
-from app.services.recettes import RecipeService
+from recette.app.services.recipes import RecipeService
 
 router = APIRouter(prefix="/api/v1/recipes")
 service = RecipeService()
