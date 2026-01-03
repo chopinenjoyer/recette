@@ -1,7 +1,7 @@
 from pydantic import BaseSettings
 
 class Settings(BaseSettings):
-    app_name: str = "Miam ?"
+    app_name: str = "AI Miam ?"
     api_version: str = "v1"
     debug: bool = False
     database_url: str

@@ -13,8 +13,22 @@ def test_get_recipes():
     response = client.get("/api/v1/recipes/")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
+    assert response.headers["content-type"].startswith("application/json")
 
-def test_create_recipe():
+def fake_generate_recipe(*args, **kwargs):
+    return {
+        "title": "Recette test IA",
+        "instructions": "Étape 1, Étape 2",
+        "generated_by": "test-agent"
+    }
+    
+def test_create_recipe(monkeypatch):
+    monkeypatch.setattr(
+        agent_module,
+        "generate_recipe",
+        fake_generate_recipe
+    )
+
     recipe_data = {
         "description": "Test description",
         "ingredients": [
@@ -22,12 +36,17 @@ def test_create_recipe():
             {"name": "ingredient2", "quantity": "2"}
         ]
     }
+
     response = client.post("/api/v1/recipes/", json=recipe_data)
+
     assert response.status_code == 201
     data = response.json()
-    assert "title" in data
-    assert isinstance(data["title"], str)
+
+    assert data["title"] == "Recette test IA"
+    assert data["generated_by"] == "test-agent"
+    assert isinstance(data["id"], int)
     assert len(data["instructions"]) > 0
 
-    assert "id" in data
-    assert "generated_by" in data
+def test_create_recipe_invalid_payload():
+    response = client.post("/api/v1/recipes/", json={})
+    assert response.status_code == 422

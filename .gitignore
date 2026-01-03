@@ -1,5 +1,6 @@
 .env
 /.venv
+/venv/
 *.secret
 secrets.json
 config/*.secret
@@ -10,3 +11,8 @@ config/*.secret
 *.py[cod]
 *.sqlite3
 *.db
+.pytest_cache/
+.log
+.DS_Store
+Thumbs.db
+.pid

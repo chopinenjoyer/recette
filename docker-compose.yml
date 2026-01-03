@@ -1,25 +1,29 @@
-version: '3.8'
-
 services:
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
+  db:
+    image: postgres:15
+    container_name: postgres_recipes
+    restart: always
     environment:
-      - ENV_FILE=.env
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: recipes_db
+    ports:
+      - "5432:5432"
     volumes:
-      - ./app:/app
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: fastapi_recipes
+    restart: always
     depends_on:
       - db
-
-  db:
-    image: postgres:latest
     environment:
-      -.env 
+      - .env
+    ports:
+      - "8000:8000"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - .:/app
 
 volumes:
-  db_data:
+  pgdata:
