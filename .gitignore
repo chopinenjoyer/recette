@@ -1,3 +1,48 @@
+# ========================
+# Environnement
+# ========================
 .env
-/.venv
-/agentia/__pycache__
+.venv/
+venv/
+
+# ========================
+# Python
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# ========================
+# Données runtime (NON versionnées)
+# ========================
+agentia/data/state/history.json
+agentia/data/state/preferences.json
+
+# ========================
+# Exports / fichiers générés
+# ========================
+*.pdf
+*.txt
+*.csv
+
+# ========================
+# OS / IDE
+# ========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ========================
+# Logs
+# ========================
+*.log
+
+# ========================
+# Jupyter (au cas où)
+# ========================
+.ipynb_checkpoints/
