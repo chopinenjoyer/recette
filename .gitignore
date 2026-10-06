@@ -2,6 +2,7 @@
 # Environnement
 # ========================
 .env
+<<<<<<< HEAD
 .venv/
 venv/
 
@@ -46,3 +47,22 @@ Thumbs.db
 # Jupyter (au cas où)
 # ========================
 .ipynb_checkpoints/
+=======
+/.venv
+/venv/
+*.secret
+secrets.json
+config/*.secret
+
+/agentia/__pycache__
+/app/__pycache__
+/app/v1/__pycache__
+*.py[cod]
+*.sqlite3
+*.db
+.pytest_cache/
+.log
+.DS_Store
+Thumbs.db
+.pid
+>>>>>>> Api
